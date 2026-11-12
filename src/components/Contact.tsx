@@ -1,12 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DiscordIcon } from "@hugeicons/core-free-icons";
 import Magnet from "@/components/react-bits/Magnet";
+import VariableProximity from "@/components/react-bits/VariableProximity";
 import { site, type ContactItem } from "@/site.config";
 
 function ContactCard({ item }: { item: ContactItem }) {
   const [copied, setCopied] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(item.value);
@@ -17,32 +21,80 @@ function ContactCard({ item }: { item: ContactItem }) {
     }
   };
 
+  const move = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--px", `${e.clientX - r.left}px`);
+    el.style.setProperty("--py", `${e.clientY - r.top}px`);
+  };
+
   return (
-    <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-[32px] border border-line bg-deep/90 p-8 sm:p-12">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cobalt/30 blur-3xl" />
+    <motion.div
+      ref={ref}
+      onPointerMove={move}
+      initial={{ opacity: 0, y: 60, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative mx-auto w-full max-w-3xl overflow-hidden rounded-[32px] border border-line bg-deep/90 p-8 sm:p-12"
+    >
+      {/* cursor-following light */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{ background: "radial-gradient(420px circle at var(--px,50%) var(--py,50%), rgba(78,107,255,.22), transparent 65%)" }}
+      />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cobalt/25 blur-3xl" />
+
       <div className="relative flex flex-col gap-10">
         <div className="flex items-center gap-4">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-cobalt text-white">
+          <motion.span
+            whileHover={{ rotate: -8, scale: 1.1 }}
+            className="grid h-14 w-14 place-items-center rounded-2xl bg-cobalt text-white"
+          >
             <HugeiconsIcon icon={DiscordIcon} size={28} />
-          </span>
+          </motion.span>
           <span className="text-lg text-muted">{item.label}</span>
         </div>
-        <p className="break-all font-display text-[clamp(2.75rem,12vw,6.5rem)] font-bold leading-none tracking-tight">
-          {item.value}
+
+        <p className="font-display text-[clamp(3rem,13vw,6.75rem)] leading-none tracking-tight">
+          <VariableProximity
+            label={item.value}
+            containerRef={ref}
+            fromFontVariationSettings="'wght' 500"
+            toFontVariationSettings="'wght' 800"
+            radius={150}
+            falloff="gaussian"
+            fromColor="#e9edf8"
+            toColor="#8fa2ff"
+          />
         </p>
-        <div className="flex flex-wrap items-center gap-4">
+
+        <div>
           <Magnet magnetStrength={4} padding={60}>
-            <button
+            <motion.button
               onClick={copy}
-              className="rounded-full bg-ice px-7 py-3.5 font-semibold text-ink transition-colors hover:bg-white"
+              whileTap={{ scale: 0.92 }}
+              className="relative min-w-44 overflow-hidden rounded-full bg-ice px-7 py-3.5 font-semibold text-ink transition-colors hover:bg-white"
             >
-              {copied ? "Copied ✓" : "Copy username"}
-            </button>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={copied ? "c" : "n"}
+                  className="block"
+                  initial={{ y: 18, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -18, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {copied ? "Copied ✓" : "Copy username"}
+                </motion.span>
+              </AnimatePresence>
+            </motion.button>
           </Magnet>
-          <span className="text-sm text-muted">Send me a friend request, I reply fast.</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -50,17 +102,25 @@ export default function Contact() {
   const loop = Array.from({ length: 8 }, () => site.handle).join("  •  ");
   return (
     <section id="contact" className="relative overflow-hidden border-t border-line/60 px-6 py-32 sm:py-44">
-      {/* outlined marquee behind the content */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-10 select-none overflow-hidden">
-        <div className="marquee flex w-max whitespace-nowrap font-display text-[clamp(5rem,16vw,13rem)] font-bold leading-none text-transparent opacity-[0.12]" style={{ WebkitTextStroke: "1.5px var(--ice)" }}>
+        <div
+          className="marquee flex w-max whitespace-nowrap font-display text-[clamp(5rem,16vw,13rem)] font-bold leading-none text-transparent opacity-[0.12]"
+          style={{ WebkitTextStroke: "1.5px var(--ice)" }}
+        >
           <span>{loop}  •  </span>
           <span>{loop}  •  </span>
         </div>
       </div>
       <div className="relative">
-        <h2 className="mx-auto mb-14 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-6xl">
-          Have an idea? Let&apos;s talk.
-        </h2>
+        <motion.h2
+          initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mb-14 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-6xl"
+        >
+          Feel free to talk with me
+        </motion.h2>
         {site.contact.map((c) => (
           <ContactCard key={c.id} item={c} />
         ))}

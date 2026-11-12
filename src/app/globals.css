@@ -30,8 +30,11 @@ body { background: var(--ink); color: var(--ice); font-family: var(--font-sans);
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
 .marquee { animation: marquee 50s linear infinite; }
+
+@keyframes wall-up { to { transform: translate3d(0, -50%, 0); } }
+@keyframes wall-down { from { transform: translate3d(0, -50%, 0); } to { transform: translate3d(0, 0, 0); } }
