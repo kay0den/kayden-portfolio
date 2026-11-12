@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
+import { animate, motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "framer-motion";
 import type { WallItem } from "@/lib/types";
 
 /**
@@ -23,7 +23,7 @@ function shuffle<T>(arr: T[]): T[] {
 function compute(): Layout {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const cols = vw < 640 ? 5 : vw < 1100 ? 7 : 9;
+  const cols = vw < 640 ? 5 : vw < 1100 ? 8 : 11;
   const gap = 10;
   const planeW = vw * 2.5;
   const planeH = vh * 2.5;
@@ -40,9 +40,17 @@ export default function TiltedWall({ items }: { items: WallItem[] }) {
   const my = useMotionValue(0);
   const smx = useSpring(mx, { stiffness: 40, damping: 18 });
   const smy = useSpring(my, { stiffness: 40, damping: 18 });
-  const rx = useMotionValue(40);
-  const ry = useMotionValue(16);
-  const transform = useMotionTemplate`rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(-20deg)`;
+  const baseRx = useMotionValue(40);
+  const baseRy = useMotionValue(16);
+  // pressing anywhere pushes the whole wall away and tips it toward the press point, then it springs back
+  const press = useMotionValue(0);
+  const kx = useMotionValue(0);
+  const ky = useMotionValue(0);
+  const rx = useTransform([baseRx, press, ky], ([a, p, k]: number[]) => a + p * k * 6);
+  const ry = useTransform([baseRy, press, kx], ([a, p, k]: number[]) => a - p * k * 6);
+  const z = useTransform(press, [0, 1], [0, -190]);
+  const scale = useTransform(press, [0, 1], [1, 1.05]);
+  const transform = useMotionTemplate`translateZ(${z}px) scale(${scale}) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(-20deg)`;
 
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>;
@@ -67,15 +75,29 @@ export default function TiltedWall({ items }: { items: WallItem[] }) {
       mx.set((e.clientX / window.innerWidth - 0.5) * 2);
       my.set((e.clientY / window.innerHeight - 0.5) * 2);
     };
+    const onDown = (e: PointerEvent) => {
+      kx.set((e.clientX / window.innerWidth - 0.5) * 2);
+      ky.set((e.clientY / window.innerHeight - 0.5) * 2);
+      animate(press, 1, { duration: 0.14, ease: "easeOut" });
+    };
+    const onUp = () => {
+      animate(press, 0, { type: "spring", stiffness: 140, damping: 9 });
+    };
     window.addEventListener("pointermove", onMove);
-    const un1 = smx.on("change", (v) => ry.set(16 + v * 9));
-    const un2 = smy.on("change", (v) => rx.set(40 - v * 7));
+    window.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    const un1 = smx.on("change", (v) => baseRy.set(16 + v * 9));
+    const un2 = smy.on("change", (v) => baseRx.set(40 - v * 7));
     return () => {
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
       un1();
       un2();
     };
-  }, [mx, my, smx, smy, rx, ry]);
+  }, [mx, my, smx, smy, baseRx, baseRy, press, kx, ky]);
 
   if (!layout || order.length === 0) return null;
   const { cols, tile, per, gap, speed } = layout;
@@ -124,7 +146,7 @@ export default function TiltedWall({ items }: { items: WallItem[] }) {
                         <div
                           className="absolute inset-0"
                           style={{
-                            background: `radial-gradient(70% 70% at 30% 25%, ${it.tint}66, transparent 70%), linear-gradient(160deg, ${it.tint}22, transparent)`,
+                            background: `radial-gradient(75% 75% at 30% 25%, ${it.tint}cc, transparent 72%), linear-gradient(160deg, ${it.tint}66, ${it.tint}14)`,
                           }}
                         />
                       )}

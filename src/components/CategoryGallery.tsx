@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Tilt from "@/components/Tilt";
 import type { Media } from "@/lib/types";
@@ -93,6 +94,8 @@ function Full({ m }: { m: Media }) {
 export default function CategoryGallery({ media }: { media: Media[] }) {
   const [open, setOpen] = useState<number | null>(null);
   const [dir, setDir] = useState(1);
+  // true only on the client (portal needs document)
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
 
   const close = useCallback(() => setOpen(null), []);
   const go = useCallback(
@@ -131,7 +134,7 @@ export default function CategoryGallery({ media }: { media: Media[] }) {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.9, delay: (i % 3) * 0.09, ease }}
           >
-            <Tilt max={5} scale={1.02} className="rounded-2xl">
+            <Tilt max={5} scale={1.02} press className="rounded-2xl">
               <button
                 onClick={() => { setDir(1); setOpen(i); }}
                 aria-label={`Open ${m.alt}`}
@@ -144,6 +147,7 @@ export default function CategoryGallery({ media }: { media: Media[] }) {
         ))}
       </div>
 
+      {mounted && createPortal(
       <AnimatePresence>
         {open !== null && (
           <motion.div
@@ -202,7 +206,9 @@ export default function CategoryGallery({ media }: { media: Media[] }) {
             )}
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body,
+      )}
     </>
   );
 }

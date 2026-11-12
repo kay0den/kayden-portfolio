@@ -24,7 +24,7 @@
 }
 
 html { background: var(--ink); color-scheme: dark; scroll-behavior: smooth; }
-body { background: var(--ink); color: var(--ice); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+body { background: transparent; color: var(--ice); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 ::selection { background: var(--cobalt); color: #fff; }
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; }
 

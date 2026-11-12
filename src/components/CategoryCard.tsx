@@ -41,7 +41,7 @@ export default function CategoryCard({ slug, title, tagline, tint, count, previe
       viewport={{ once: true, margin: "-90px" }}
       transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Tilt max={7} scale={1.025} spotlight className="rounded-[28px]">
+      <Tilt max={7} scale={1.025} spotlight press className="rounded-[28px]">
         <Link
           href={`/work/${slug}`}
           className="group/card relative block aspect-square overflow-hidden rounded-[28px] border border-line bg-deep"

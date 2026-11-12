@@ -5,11 +5,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { DiscordIcon } from "@hugeicons/core-free-icons";
 import Magnet from "@/components/react-bits/Magnet";
 import VariableProximity from "@/components/react-bits/VariableProximity";
+import { usePressRipple } from "@/components/usePressRipple";
 import { site, type ContactItem } from "@/site.config";
 
 function ContactCard({ item }: { item: ContactItem }) {
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const card = usePressRipple();
+  const btn = usePressRipple("rgba(10,14,26,.25)");
 
   const copy = async () => {
     try {
@@ -33,12 +36,14 @@ function ContactCard({ item }: { item: ContactItem }) {
     <motion.div
       ref={ref}
       onPointerMove={move}
+      onPointerDown={card.onPointerDown}
       initial={{ opacity: 0, y: 60, scale: 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       className="group relative mx-auto w-full max-w-3xl overflow-hidden rounded-[32px] border border-line bg-deep/90 p-8 sm:p-12"
     >
+      {card.layer}
       {/* cursor-following light */}
       <div
         aria-hidden
@@ -75,9 +80,11 @@ function ContactCard({ item }: { item: ContactItem }) {
           <Magnet magnetStrength={4} padding={60}>
             <motion.button
               onClick={copy}
+              onPointerDown={btn.onPointerDown}
               whileTap={{ scale: 0.92 }}
               className="relative min-w-44 overflow-hidden rounded-full bg-ice px-7 py-3.5 font-semibold text-ink transition-colors hover:bg-white"
             >
+              {btn.layer}
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
                   key={copied ? "c" : "n"}

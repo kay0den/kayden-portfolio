@@ -1,6 +1,7 @@
 "use client";
 import { useRef, type ReactNode } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { usePressRipple } from "@/components/usePressRipple";
 
 interface Props {
   children: ReactNode;
@@ -9,11 +10,14 @@ interface Props {
   scale?: number;
   /** soft light that follows the cursor (use on cards, not on artwork) */
   spotlight?: boolean;
+  /** pressing squishes the element and sends a wave from the click point */
+  press?: boolean;
   className?: string;
 }
 
 /** Tilts toward the mouse. Pure transform: it never paints over its children unless spotlight is on. */
-export default function Tilt({ children, max = 6, scale = 1.02, spotlight = false, className = "" }: Props) {
+export default function Tilt({ children, max = 6, scale = 1.02, spotlight = false, press = false, className = "" }: Props) {
+  const ripple = usePressRipple();
   const ref = useRef<HTMLDivElement>(null);
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
@@ -43,12 +47,15 @@ export default function Tilt({ children, max = 6, scale = 1.02, spotlight = fals
       ref={ref}
       onPointerMove={move}
       onPointerLeave={leave}
+      onPointerDown={press ? ripple.onPointerDown : undefined}
       whileHover={{ scale }}
+      whileTap={press ? { scale: scale * 0.95 } : undefined}
       transition={{ type: "spring", stiffness: 260, damping: 24 }}
       style={{ rotateX, rotateY, transformPerspective: 1000 }}
       className={`group relative ${className}`}
     >
       {children}
+      {press && ripple.layer}
       {spotlight && (
         <div
           aria-hidden
