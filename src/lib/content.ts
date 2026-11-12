@@ -43,3 +43,17 @@ export function getRelated(project: Project, limit = 3): Project[] {
     .sort((a, b) => Number(b.category === project.category) - Number(a.category === project.category))
     .slice(0, limit);
 }
+
+export interface CategoryMedia { media: import("./types").Media; project: string }
+
+/** All images/videos of a category (covers + galleries), for previews and galleries. */
+export function getCategoryMedia(slug: string): CategoryMedia[] {
+  const cat = getCategory(slug);
+  const out: CategoryMedia[] = [];
+  if (cat?.cover) out.push({ media: cat.cover, project: cat.title });
+  for (const p of getProjects(slug)) {
+    if (p.cover) out.push({ media: p.cover, project: p.title });
+    for (const m of p.gallery) out.push({ media: m, project: p.title });
+  }
+  return out;
+}
