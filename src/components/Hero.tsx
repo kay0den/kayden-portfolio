@@ -1,6 +1,6 @@
 "use client";
 import { useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import ShinyText from "@/components/react-bits/ShinyText";
 import VariableProximity from "@/components/react-bits/VariableProximity";
 import Magnet from "@/components/react-bits/Magnet";
@@ -14,6 +14,9 @@ import { site } from "@/site.config";
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const btn = usePressRipple();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const lift = useTransform(scrollYProgress, [0, 1], [0, -140]);
+  const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const spring = { stiffness: 90, damping: 18, mass: 0.7 };
@@ -35,6 +38,7 @@ export default function Hero() {
       onPointerLeave={onLeave}
       className="relative mx-auto flex min-h-dvh max-w-6xl flex-col justify-center px-6"
     >
+      <motion.div style={{ y: lift, opacity: fade }}>
       <motion.div
         initial={{ opacity: 0, y: 70, filter: "blur(18px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -115,6 +119,7 @@ export default function Hero() {
             <svg className="transition-transform duration-500 group-hover:translate-y-1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
           </motion.a>
         </Magnet>
+      </motion.div>
       </motion.div>
     </section>
   );

@@ -25,6 +25,9 @@
 
 html { background: var(--ink); color-scheme: dark; scroll-behavior: smooth; }
 body { background: transparent; color: var(--ice); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+body { -webkit-user-select: none; user-select: none; }
+input, textarea, .select-text { -webkit-user-select: text; user-select: text; }
+img { -webkit-user-drag: none; }
 ::selection { background: var(--cobalt); color: #fff; }
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; }
 
@@ -38,3 +41,13 @@ body { background: transparent; color: var(--ice); font-family: var(--font-sans)
 
 @keyframes wall-up { to { transform: translate3d(0, -50%, 0); } }
 @keyframes wall-down { from { transform: translate3d(0, -50%, 0); } to { transform: translate3d(0, 0, 0); } }
+
+/* ── custom cursor ring ── */
+.cursor { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; opacity: 0; transition: opacity .3s; will-change: transform; }
+.cursor-ring { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9999px; border: 1px solid rgba(233,237,248,.45); transition: width .4s cubic-bezier(.22,1,.36,1), height .4s cubic-bezier(.22,1,.36,1), background .3s, border-color .3s, transform .2s; }
+.cursor[data-state="link"] .cursor-ring { width: 60px; height: 60px; border-color: var(--cobalt); background: rgba(78,107,255,.15); }
+.cursor[data-state="label"] .cursor-ring { width: 96px; height: 96px; border-color: transparent; background: var(--cobalt); }
+.cursor[data-press="1"] .cursor-ring { transform: scale(.82); }
+.cursor-label { font-size: 13px; font-weight: 600; color: #fff; letter-spacing: .02em; opacity: 0; transition: opacity .2s; }
+.cursor[data-state="label"] .cursor-label { opacity: 1; }
+@media (pointer: coarse) { .cursor { display: none; } }

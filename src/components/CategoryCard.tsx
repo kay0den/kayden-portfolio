@@ -44,6 +44,7 @@ export default function CategoryCard({ slug, title, tagline, tint, count, previe
       <Tilt max={7} scale={1.025} spotlight press className="rounded-[28px]">
         <Link
           href={`/work/${slug}`}
+          data-cursor="Open"
           className="group/card relative block aspect-square overflow-hidden rounded-[28px] border border-line bg-deep"
         >
           <div className="absolute inset-0 transition-transform duration-[900ms] ease-out group-hover/card:scale-[1.07]">

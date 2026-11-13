@@ -51,11 +51,16 @@ export default function LightField() {
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onUp);
     window.addEventListener("resize", resize);
+    // fast clicking can start a native drag/selection, which silences pointer events: forbid it
+    const noDrag = (e: Event) => e.preventDefault();
+    window.addEventListener("dragstart", noDrag);
 
     const easeOut = (t: number) => 1 - Math.pow(1 - t, 2);
     const maxR = () => Math.hypot(window.innerWidth, window.innerHeight);
 
-    const frame = (now: number) => {
+    const frame = () => {
+      const now = performance.now(); // same clock as the click timestamps (rAF time can be earlier => negative radius)
+      try {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
 
@@ -90,9 +95,9 @@ export default function LightField() {
       // light waves from clicks
       for (let i = waves.length - 1; i >= 0; i--) {
         const wv = waves[i];
-        const p = (now - wv.t0) / WAVE_MS;
+        const p = Math.max(0, (now - wv.t0) / WAVE_MS);
         if (p >= 1) { waves.splice(i, 1); continue; }
-        const r = easeOut(p) * maxR() * SCALE;
+        const r = Math.max(0, easeOut(p) * maxR() * SCALE);
         const th = (46 + 150 * p) * SCALE;
         const a = Math.pow(1 - p, 1.4);
         const wx = wv.x * SCALE, wy = wv.y * SCALE;
@@ -130,7 +135,11 @@ export default function LightField() {
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
 
-      raf = requestAnimationFrame(frame);
+      } catch {
+        /* a single bad frame must never stop the light */
+      } finally {
+        raf = requestAnimationFrame(frame);
+      }
     };
     raf = requestAnimationFrame(frame);
 
@@ -141,6 +150,7 @@ export default function LightField() {
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("dragstart", noDrag);
     };
   }, []);
 

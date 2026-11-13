@@ -138,6 +138,7 @@ export default function CategoryGallery({ media }: { media: Media[] }) {
               <button
                 onClick={() => { setDir(1); setOpen(i); }}
                 aria-label={`Open ${m.alt}`}
+                data-cursor="View"
                 className="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl border border-line bg-deep text-left"
               >
                 <Thumb m={m} />

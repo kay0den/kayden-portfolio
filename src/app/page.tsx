@@ -2,7 +2,7 @@ import { getCategories, getCategoryMedia } from "@/lib/content";
 import Hero from "@/components/Hero";
 import CategoryCard from "@/components/CategoryCard";
 import Contact from "@/components/Contact";
-import Reveal from "@/components/Reveal";
+import WordReveal, { DrawLine } from "@/components/WordReveal";
 
 export default function Home() {
   const categories = getCategories().map((c) => {
@@ -15,9 +15,8 @@ export default function Home() {
       <Hero />
 
       <section id="work" className="mx-auto max-w-6xl scroll-mt-10 px-6 pb-40 pt-24">
-        <Reveal as="h2" className="mb-14 max-w-xl font-display text-4xl font-bold tracking-tight sm:text-6xl">
-          Pick a discipline.
-        </Reveal>
+        <WordReveal text="Pick a discipline." className="max-w-xl font-display text-4xl font-bold tracking-tight sm:text-6xl" />
+        <DrawLine className="mb-14 mt-8" />
         <div className="grid gap-6 pb-16 sm:grid-cols-2 sm:gap-8">
           {categories.map((c, idx) => (
             <div key={c.slug} className={idx % 2 === 1 ? "sm:translate-y-16" : ""}>

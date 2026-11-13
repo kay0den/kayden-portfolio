@@ -6,6 +6,7 @@ import { DiscordIcon } from "@hugeicons/core-free-icons";
 import Magnet from "@/components/react-bits/Magnet";
 import VariableProximity from "@/components/react-bits/VariableProximity";
 import { usePressRipple } from "@/components/usePressRipple";
+import WordReveal from "@/components/WordReveal";
 import { site, type ContactItem } from "@/site.config";
 
 function ContactCard({ item }: { item: ContactItem }) {
@@ -80,6 +81,7 @@ function ContactCard({ item }: { item: ContactItem }) {
           <Magnet magnetStrength={4} padding={60}>
             <motion.button
               onClick={copy}
+              data-cursor="Copy"
               onPointerDown={btn.onPointerDown}
               whileTap={{ scale: 0.92 }}
               className="relative min-w-44 overflow-hidden rounded-full bg-ice px-7 py-3.5 font-semibold text-ink transition-colors hover:bg-white"
@@ -119,15 +121,7 @@ export default function Contact() {
         </div>
       </div>
       <div className="relative">
-        <motion.h2
-          initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mb-14 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-6xl"
-        >
-          Feel free to talk with me
-        </motion.h2>
+        <WordReveal text="Feel free to talk with me" className="mx-auto mb-14 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-6xl" />
         {site.contact.map((c) => (
           <ContactCard key={c.id} item={c} />
         ))}
