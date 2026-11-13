@@ -4,6 +4,10 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import ShinyText from "@/components/react-bits/ShinyText";
 import VariableProximity from "@/components/react-bits/VariableProximity";
 import Magnet from "@/components/react-bits/Magnet";
+import dynamic from "next/dynamic";
+
+// uses Math.random internally, so it must render in the browser only
+const RotatingText = dynamic(() => import("@/components/react-bits/RotatingText"), { ssr: false });
 import { usePressRipple } from "@/components/usePressRipple";
 import { site } from "@/site.config";
 
@@ -36,22 +40,42 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 1.3, delay: 1.35, ease: [0.22, 1, 0.36, 1] }}
       >
-        <motion.div style={{ rotateX, rotateY, x, transformPerspective: 1100 }}>
-          <h1>
-          <ShinyText
-            text={site.name}
-            color="#b3bfef"
-            shineColor="#ffffff"
-            speed={3.4}
-            delay={0.6}
-            angle={110}
-            shineWidth={36}
-            glow={0.35}
-            followPointer
-            className="font-display text-[clamp(4rem,17vw,13rem)] font-extrabold leading-[0.9] tracking-tight"
-          />
-          </h1>
-        </motion.div>
+        <div className="relative flex flex-wrap items-end gap-x-6 gap-y-5">
+          {/* soft bloom behind the name */}
+          <div aria-hidden className="pointer-events-none absolute -left-10 top-1/2 h-48 w-[70%] -translate-y-1/2 rounded-full bg-cobalt/20 blur-[90px]" />
+          <motion.div style={{ rotateX, rotateY, x, transformPerspective: 1100 }} className="relative">
+            <h1>
+              <ShinyText
+                text={site.name}
+                color="#b3bfef"
+                shineColor="#ffffff"
+                speed={3.4}
+                delay={0.6}
+                angle={110}
+                shineWidth={36}
+                glow={0.4}
+                followPointer
+                className="font-display text-[clamp(3.5rem,13vw,10.5rem)] font-extrabold leading-[0.9] tracking-tight"
+              />
+            </h1>
+          </motion.div>
+          <motion.div
+            className="relative mb-[0.6vw]"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 2.1, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <RotatingText
+              texts={["Coding", "Drawing", "Modeling", "Building", "Rigging"]}
+              effect="flip"
+              highlight
+              highlightColor="#4e6bff"
+              rotationInterval={2300}
+              staggerDuration={0.035}
+              mainClassName="font-display text-[clamp(1.5rem,4.4vw,3.4rem)] font-bold text-white px-4 py-1.5 sm:px-5 rounded-2xl"
+            />
+          </motion.div>
+        </div>
       </motion.div>
 
       <motion.div

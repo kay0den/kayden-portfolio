@@ -8,7 +8,6 @@ import Background from "@/components/Background";
 import Preloader from "@/components/Preloader";
 import ScrollProgress from "@/components/ScrollProgress";
 import Header from "@/components/Header";
-import Noise from "@/components/react-bits/Noise";
 
 export const metadata: Metadata = {
   title: { default: `${site.name} — ${site.role}`, template: `%s — ${site.name}` },
@@ -22,7 +21,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh">
         <Preloader />
         <Background items={wall} />
-        <Noise opacity={0.07} fixed />
         <ScrollProgress />
         <Header />
         {children}
