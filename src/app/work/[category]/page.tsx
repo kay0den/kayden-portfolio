@@ -5,6 +5,8 @@ import CategoryGallery from "@/components/CategoryGallery";
 import Reveal from "@/components/Reveal";
 import WordReveal, { DrawLine } from "@/components/WordReveal";
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getCategories().map((c) => ({ category: c.slug }));
 }

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Tilt from "@/components/Tilt";
@@ -13,6 +13,19 @@ interface Props {
   tint: string;
   count: number;
   previews: Media[];
+}
+
+/** Shown the instant a card is clicked, until the next page is ready. */
+function Pending() {
+  const { pending } = useLinkStatus();
+  return (
+    <span
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 z-30 grid place-items-center bg-ink/55 transition-opacity duration-200 ${pending ? "opacity-100" : "opacity-0"}`}
+    >
+      <span className="h-10 w-10 animate-spin rounded-full border-2 border-ice/25 border-t-cobalt" />
+    </span>
+  );
 }
 
 function Slide({ m }: { m: Media }) {
@@ -36,10 +49,10 @@ export default function CategoryCard({ slug, title, tagline, tint, count, previe
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 70, scale: 0.94, filter: "blur(10px)" }}
-      whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+      initial={{ opacity: 0, y: 50, scale: 0.96 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-90px" }}
-      transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
       <Tilt max={7} scale={1.025} spotlight press className="rounded-[28px]">
         <Link
@@ -72,6 +85,7 @@ export default function CategoryCard({ slug, title, tagline, tint, count, previe
           </div>
 
           <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent" />
+          <Pending />
 
           <span className="absolute right-5 top-5 rounded-full border border-ice/20 bg-ink/40 px-3 py-1 text-xs text-ice/80">
             {count} {count === 1 ? "work" : "works"}

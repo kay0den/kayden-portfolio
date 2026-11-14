@@ -16,18 +16,25 @@ function PlayBadge() {
   );
 }
 
-function Thumb({ m }: { m: Media }) {
-  if (m.type === "image")
-    return (
+function ImageThumb({ m }: { m: Extract<Media, { type: "image" }> }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="relative bg-deep" style={{ aspectRatio: `${m.width} / ${m.height}` }}>
+      {!loaded && <span aria-hidden className="shimmer absolute inset-0" />}
       <Image
         src={m.src}
         alt={m.alt}
-        width={m.width}
-        height={m.height}
+        fill
         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-        className="h-auto w-full transition-transform duration-700 group-hover:scale-[1.04]"
+        onLoad={() => setLoaded(true)}
+        className={`object-cover transition-[opacity,transform] duration-700 group-hover:scale-[1.04] ${loaded ? "opacity-100" : "opacity-0"}`}
       />
-    );
+    </div>
+  );
+}
+
+function Thumb({ m }: { m: Media }) {
+  if (m.type === "image") return <ImageThumb m={m} />;
   if (m.type === "video")
     return (
       <div className="relative aspect-video bg-deep">
@@ -129,10 +136,10 @@ export default function CategoryGallery({ media }: { media: Media[] }) {
           <motion.div
             key={i}
             className="break-inside-avoid"
-            initial={{ opacity: 0, y: 60, scale: 0.95, filter: "blur(12px)" }}
-            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 40, scale: 0.97 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.9, delay: (i % 3) * 0.09, ease }}
+            transition={{ duration: 0.65, delay: (i % 3) * 0.07, ease }}
           >
             <Tilt max={5} scale={1.02} press className="rounded-2xl">
               <button
@@ -153,7 +160,7 @@ export default function CategoryGallery({ media }: { media: Media[] }) {
         {open !== null && (
           <motion.div
             key="lb"
-            className="fixed inset-0 z-[80] grid place-items-center bg-ink/92 backdrop-blur-md"
+            className="fixed inset-0 z-[80] grid place-items-center bg-ink/95"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

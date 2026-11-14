@@ -15,7 +15,7 @@ export default function Header() {
       className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-6 py-5 md:px-10"
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.9, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.7, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
       <Magnet magnetStrength={5} padding={40}>
         <Link href="/" className="font-display text-lg font-bold tracking-wide transition-[letter-spacing] duration-500 hover:tracking-[0.18em]">

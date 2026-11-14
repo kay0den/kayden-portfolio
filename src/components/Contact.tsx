@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DiscordIcon } from "@hugeicons/core-free-icons";
 import Magnet from "@/components/react-bits/Magnet";
@@ -109,12 +109,14 @@ function ContactCard({ item }: { item: ContactItem }) {
 
 export default function Contact() {
   const loop = Array.from({ length: 8 }, () => site.handle).join("  •  ");
+  const mqRef = useRef<HTMLDivElement>(null);
+  const mqVisible = useInView(mqRef, { margin: "200px" }); // no animating what nobody can see
   return (
     <section id="contact" className="relative overflow-hidden border-t border-line/60 px-6 py-32 sm:py-44">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-10 select-none overflow-hidden">
+      <div ref={mqRef} aria-hidden className="pointer-events-none absolute inset-x-0 top-10 select-none overflow-hidden">
         <div
-          className="marquee flex w-max whitespace-nowrap font-display text-[clamp(5rem,16vw,13rem)] font-bold leading-none text-transparent opacity-[0.12]"
-          style={{ WebkitTextStroke: "1.5px var(--ice)" }}
+          className="marquee will-change-transform flex w-max whitespace-nowrap font-display text-[clamp(5rem,16vw,13rem)] font-bold leading-none text-transparent opacity-[0.12]"
+          style={{ WebkitTextStroke: "1.5px var(--ice)", animationPlayState: mqVisible ? "running" : "paused" }}
         >
           <span>{loop}  •  </span>
           <span>{loop}  •  </span>
