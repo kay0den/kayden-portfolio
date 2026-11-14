@@ -1,9 +1,0 @@
-{
-  "title": "Sample Project (replace me)",
-  "summary": "Placeholder entry that proves the content pipeline works.",
-  "year": 2026,
-  "description": "Delete this file and add your real projects as one JSON file each.",
-  "gallery": [],
-  "breakdown": [{ "heading": "Approach", "body": "Describe how you made it." }],
-  "tools": ["Blender"]
-}
