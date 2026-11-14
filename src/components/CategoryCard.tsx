@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
 import Link, { useLinkStatus } from "next/link";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import Tilt from "@/components/Tilt";
 import type { Media } from "@/lib/types";
 
@@ -29,51 +29,59 @@ function Pending() {
 }
 
 function Slide({ m }: { m: Media }) {
-  if (m.type === "video")
-    return <video src={m.src} poster={m.poster} muted loop autoPlay playsInline preload="metadata" className="h-full w-full object-cover" />;
+  if (m.type === "image")
+    return <Image src={m.src} alt={m.alt} fill sizes="(min-width: 640px) 50vw, 100vw" quality={60} className="object-cover" />;
   if (m.type === "embed")
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={m.thumb} alt={m.alt} className="h-full w-full object-cover" />;
-  return <Image src={m.src} alt={m.alt} fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />;
+    return <img src={m.thumb} alt={m.alt} loading="lazy" className="h-full w-full object-cover" />;
+  return null; // videos are never loaded for previews
 }
 
 export default function CategoryCard({ slug, title, tagline, tint, count, previews }: Props) {
-  const [i, setI] = useState(0);
+  const imgs = previews.filter((m) => m.type !== "video").slice(0, 4);
+  const box = useRef<HTMLDivElement>(null);
+  const visible = useInView(box, { margin: "100px" });
+  const [pair, setPair] = useState({ cur: 0, prev: -1 });
 
+  // the slideshow only runs while the card is on screen
   useEffect(() => {
-    if (previews.length < 2) return;
+    if (!visible || imgs.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setI((n) => (n + 1) % previews.length), 3800);
+    const t = setInterval(() => setPair((p) => ({ cur: (p.cur + 1) % imgs.length, prev: p.cur })), 4500);
     return () => clearInterval(t);
-  }, [previews.length]);
+  }, [visible, imgs.length]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-90px" }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      ref={box}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Tilt max={7} scale={1.025} spotlight press className="rounded-[28px]">
+      <Tilt max={6} scale={1.02} className="rounded-[28px]">
         <Link
           href={`/work/${slug}`}
-          data-cursor="Open"
           className="group/card relative block aspect-square overflow-hidden rounded-[28px] border border-line bg-deep"
         >
-          <div className="absolute inset-0 transition-transform duration-[900ms] ease-out group-hover/card:scale-[1.07]">
-            {previews.length > 0 ? (
-              <AnimatePresence mode="popLayout">
+          <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover/card:scale-[1.05]">
+            {imgs.length > 0 ? (
+              <>
+                {pair.prev >= 0 && (
+                  <div key={`p${pair.prev}`} className="absolute inset-0">
+                    <Slide m={imgs[pair.prev]} />
+                  </div>
+                )}
                 <motion.div
-                  key={i}
+                  key={`c${pair.cur}`}
                   className="absolute inset-0"
-                  initial={{ opacity: 0, scale: 1.08 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.2 }}
+                  initial={{ opacity: pair.prev >= 0 ? 0 : 1 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.9 }}
                 >
-                  <Slide m={previews[i]} />
+                  <Slide m={imgs[pair.cur]} />
                 </motion.div>
-              </AnimatePresence>
+              </>
             ) : (
               <div
                 className="absolute inset-0"
@@ -92,12 +100,12 @@ export default function CategoryCard({ slug, title, tagline, tint, count, previe
           </span>
 
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 sm:p-8">
-            <div className="transition-transform duration-500 group-hover/card:-translate-y-1">
+            <div>
               <h3 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">{title}</h3>
               <p className="mt-3 text-sm text-ice/70 sm:text-base">{tagline}</p>
             </div>
-            <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full border border-ice/30 transition-all duration-500 group-hover/card:rotate-45 group-hover/card:border-transparent group-hover/card:text-ink">
-              <span className="absolute inset-0 scale-0 rounded-full transition-transform duration-500 group-hover/card:scale-100" style={{ background: tint }} />
+            <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full border border-ice/30 transition-colors duration-300 group-hover/card:border-transparent group-hover/card:text-ink">
+              <span className="absolute inset-0 scale-0 rounded-full transition-transform duration-300 group-hover/card:scale-100" style={{ background: tint }} />
               <svg className="relative" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M8 7h9v9" /></svg>
             </span>
           </div>

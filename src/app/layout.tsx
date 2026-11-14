@@ -8,7 +8,6 @@ import Background from "@/components/Background";
 import Preloader from "@/components/Preloader";
 import ScrollProgress from "@/components/ScrollProgress";
 import Header from "@/components/Header";
-import Cursor from "@/components/Cursor";
 
 export const metadata: Metadata = {
   title: { default: `${site.name} — ${site.role}`, template: `%s — ${site.name}` },
@@ -23,7 +22,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Preloader />
         <Background items={wall} />
         <ScrollProgress />
-        <Cursor />
         <Header />
         {children}
       </body>

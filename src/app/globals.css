@@ -42,16 +42,26 @@ img { -webkit-user-drag: none; }
 @keyframes wall-up { to { transform: translate3d(0, -50%, 0); } }
 @keyframes wall-down { from { transform: translate3d(0, -50%, 0); } to { transform: translate3d(0, 0, 0); } }
 
-/* ── custom cursor ring ── */
-.cursor { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; opacity: 0; transition: opacity .3s; will-change: transform; }
-.cursor-ring { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9999px; border: 1px solid rgba(233,237,248,.45); transition: width .4s cubic-bezier(.22,1,.36,1), height .4s cubic-bezier(.22,1,.36,1), background .3s, border-color .3s, transform .2s; }
-.cursor[data-state="link"] .cursor-ring { width: 60px; height: 60px; border-color: var(--cobalt); background: rgba(78,107,255,.15); }
-.cursor[data-state="label"] .cursor-ring { width: 96px; height: 96px; border-color: transparent; background: var(--cobalt); }
-.cursor[data-press="1"] .cursor-ring { transform: scale(.82); }
-.cursor-label { font-size: 13px; font-weight: 600; color: #fff; letter-spacing: .02em; opacity: 0; transition: opacity .2s; }
-.cursor[data-state="label"] .cursor-label { opacity: 1; }
-@media (pointer: coarse) { .cursor { display: none; } }
-
 /* ── loading placeholders ── */
 @keyframes shimmer { to { background-position: -200% 0; } }
 .shimmer { background: linear-gradient(100deg, var(--deep) 30%, #1a2347 50%, var(--deep) 70%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
+
+/* ── name shine: pure CSS (no JS, no mouse listeners); sweeps for ~2.5s, then rests ── */
+.shine-text {
+  background: linear-gradient(110deg, #b3bfef 0%, #b3bfef 42%, #ffffff 50%, #b3bfef 58%, #b3bfef 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shine 6.5s ease-in-out infinite;
+}
+@keyframes shine { 0%, 55% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* ── wall: fades in once, and stops moving once you scroll past the first screen ── */
+.wall-fade { animation: wall-fade 1.4s ease .3s both; }
+@keyframes wall-fade { from { opacity: 0; } to { opacity: 1; } }
+[data-paused="true"] .wall-col { animation-play-state: paused !important; }
+
+@keyframes fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.fade-up { animation: fade-up .55s cubic-bezier(.22, 1, .36, 1) both; }

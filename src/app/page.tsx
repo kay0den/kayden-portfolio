@@ -7,7 +7,7 @@ import WordReveal, { DrawLine } from "@/components/WordReveal";
 export default function Home() {
   const categories = getCategories().map((c) => {
     const media = getCategoryMedia(c.slug);
-    return { ...c, count: media.length, previews: media.slice(0, 6) };
+    return { ...c, count: media.length, previews: media.filter((m) => m.type !== "video").slice(0, 4) };
   });
 
   return (
