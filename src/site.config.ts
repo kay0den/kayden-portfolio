@@ -11,7 +11,7 @@ export interface ContactItem {
 export const site = {
   name: "KAYDEN",
   handle: "kayd0en",
-  role: "Creative Developer & Artist",
-  description: "Portfolio of KAYDEN — 3D art, animation, drawing, programming and more.",
+  role: "Developer in Roblox Studio",
+  description: "Portfolio of KAYDEN — 3D art, animation, drawing, Coding and more.",
   contact: [{ id: "discord", label: "Discord", value: "kayd0en", type: "copy" }] satisfies ContactItem[] as ContactItem[],
 };
